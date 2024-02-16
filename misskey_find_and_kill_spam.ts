@@ -1,28 +1,21 @@
-// Rev 1.1
+// Rev 2
 // for Misskey
-//
 // Required permissions:
 //   write:notes
 //   write:admin:suspend-user
 //
-// Run with Deno:
-//   deno run --allow-net misskey_find_and_kill_spam.ts
-
-// Disclaimer!
-// This script is not tested (yet), be careful!
+// Run with: deno run --allow-net misskey_find_and_kill_spam.ts
 
 
-// ▼ SERVER URL HERE ▼
 const SERVER_URL = "https://misskey.example.com/"
-
-// ▼ ACCOUNT ACCESS TOKEN HERE ▼
-const API_ACCESS_TOKEN = ""
+const API_ACCESS_TOKEN = "InsertApiAccessTokenHere"
 
 // Other settings
-const NEW_ACCOUNT_THRESHOLD = 1000 * 60 * 15
+const NEW_ACCOUNT_THRESHOLD = 1000 * 60 * 20
 const MENTIONS_THRESHOLD = 5
 
 const FETCH_DELAY = 1000
+const REPORT_REPEATS = 10
 const TESTING_MODE = false
 
 
@@ -58,11 +51,11 @@ function parseAidx(id: string): Date {
 }
 
 function shouldKillNote(note: Record<string, any>) {
-    const {id, userId, visblity, user, text } = note
+    const {id, userId, visibility, user, text } = note
     const mentions: Array<string> = note["mentions"] ?? []
 
     const conditions = [
-        () => visblity == "public",
+        () => visibility == "public",
         () => mentions.length >= MENTIONS_THRESHOLD,
         () => parseAidx(userId).getTime() >= (Date.now() - NEW_ACCOUNT_THRESHOLD),
         () => user["avatarBlurhash"] == null,
@@ -76,24 +69,27 @@ function killNote(note: Record<string, any>) {
 
     console.log(
         `[${new Date().toISOString()}] `,
-        `Bad note ${id} from user @${user["username"] ?? "?"}@${user["host"] ?? "?"}`
+        `Bad note ${id} from user @${user["username"] ?? "?"}@${user["host"] ?? "this_server"}`
     )
 
     console.log(
         `    Content: ${text.slice(0, 100).replaceAll("\n", "\\n")}`
     )
 
-    if (TESTING_MODE) {return}
-
     requestApi("notes/delete", {noteId: id})
     requestApi("admin/suspend-user", {userId: userId})
 }
+
+
+let lastId = undefined
+let reports = REPORT_REPEATS
+let processedNotes = 0
 
 async function fetchNotes() {
     try {
         const notes: Array<Record<string, any>> = await requestApi("notes/global-timeline", {
             withRenotes: false,
-            sinceDate: Date.now() - FETCH_DELAY * 10,  // ??
+            sinceId: lastId,
             limit: 100,
         })
     
@@ -101,12 +97,22 @@ async function fetchNotes() {
             if (shouldKillNote(note)) {
                 killNote(note)
             }
+            lastId = note.id
         })
+
+        processedNotes += notes.length
+        reports -= 1
+
+        if (reports <= 0) {
+            console.log(`[${new Date().toISOString()}] `, `processed ${processedNotes} notes.`)
+            processedNotes = 0
+            reports = REPORT_REPEATS
+        }
     } catch (e) {
         console.error(`[${new Date().toISOString()}] `, e)
     }
 }
 
 setInterval(fetchNotes, FETCH_DELAY)
-console.log(`[${new Date().toISOString()}] `, "find_and_kill_spam: rev 1.1")
+console.log(`[${new Date().toISOString()}] `, "find_and_kill_spam: REV 2")
 console.log(`[${new Date().toISOString()}] `, "find_and_kill_spam: Started!")
