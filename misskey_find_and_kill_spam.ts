@@ -1,4 +1,4 @@
-// Rev 2
+// Rev 3
 // for Misskey
 // Required permissions:
 //   write:notes
@@ -29,11 +29,16 @@ async function requestApi(endpoint: string, body: Record<string, any>) {
     const url = SERVER_URL.replace(/\/$/, "") + "/api/" + endpoint
     const headers = {"Content-Type": "application/json"}
 
-    const resJson = await fetch(url, {
+    const res = await fetch(url, {
         headers,
         body: jsonBody,
         method: "POST",
-    }).then(x => x.json())
+    })
+
+    let resJson = undefined
+    try {
+        resJson = await res.json()
+    } catch (e) {}
 
     if (TESTING_MODE) {
         console.info({...body, i: "******"})
@@ -114,5 +119,5 @@ async function fetchNotes() {
 }
 
 setInterval(fetchNotes, FETCH_DELAY)
-console.log(`[${new Date().toISOString()}] `, "find_and_kill_spam: REV 2")
+console.log(`[${new Date().toISOString()}] `, "find_and_kill_spam: rev 3")
 console.log(`[${new Date().toISOString()}] `, "find_and_kill_spam: Started!")
