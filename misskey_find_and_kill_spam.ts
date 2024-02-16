@@ -1,4 +1,4 @@
-// Rev 1.0
+// Rev 1.1
 // for Misskey
 //
 // Required permissions:
@@ -9,7 +9,7 @@
 //   deno run --allow-net misskey_find_and_kill_spam.ts
 
 // Disclaimer!
-// This script is absolutely not tested (yet), be careful!
+// This script is not tested (yet), be careful!
 
 
 // ▼ SERVER URL HERE ▼
@@ -19,10 +19,11 @@ const SERVER_URL = "https://misskey.example.com/"
 const API_ACCESS_TOKEN = ""
 
 // Other settings
-const FETCH_DELAY = 1000  // (milliseconds)
 const NEW_ACCOUNT_THRESHOLD = 1000 * 60 * 15
-const TESTING_MODE = false
+const MENTIONS_THRESHOLD = 5
 
+const FETCH_DELAY = 1000
+const TESTING_MODE = false
 
 
 async function requestApi(endpoint: string, body: Record<string, any>) {
@@ -62,8 +63,8 @@ function shouldKillNote(note: Record<string, any>) {
 
     const conditions = [
         () => visblity == "public",
-        () => mentions.length >= 8,
-        () => parseAidx(userId).getTime() > (Date.now() - NEW_ACCOUNT_THRESHOLD),
+        () => mentions.length >= MENTIONS_THRESHOLD,
+        () => parseAidx(userId).getTime() >= (Date.now() - NEW_ACCOUNT_THRESHOLD),
         () => user["avatarBlurhash"] == null,
     ]
 
@@ -107,4 +108,5 @@ async function fetchNotes() {
 }
 
 setInterval(fetchNotes, FETCH_DELAY)
+console.log(`[${new Date().toISOString()}] `, "find_and_kill_spam: rev 1.1")
 console.log(`[${new Date().toISOString()}] `, "find_and_kill_spam: Started!")
