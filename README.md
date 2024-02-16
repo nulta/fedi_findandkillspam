@@ -1,8 +1,8 @@
 # fedi_findandkillspam
-find and kill those spam posts
+find and kill those global spam posts
 
 - misskey only (yet)
-- ~~100% NOT tested (yet)~~ Tested!!!!
+- ~~100% NOT tested (yet)~~ **Tested, works well!** Big thanks to buttersc.one's really awesome administrators.
 - no websocket, but fetches new post every second (yet)
 
 ## Usage
@@ -30,7 +30,7 @@ find and kill those spam posts
 - 생성일자가 짧은 계정이 수상할 정도로 멘션이 많은 공개 노트를 올린다면, 계정을 정지하고 노트는 삭제합니다
 - 서버 단위가 아닌 유저 단위로 작동합니다
     - 서버에서 별도의 설정을 할 필요가 없습니다
-    - 미스키에 접속할 수 있는 일반 컴퓨터에서 실행해도 잘 작동합니다
+    - 네, 원래는 사람 모더레이터가 했을 일을 얘가 대신 한다고 생각하시면 됩니다.
 
 ### 비고
 **Rev 3부터 제대로 작동합니다.** 그 전까지는 제대로 테스트를 못 했어요...
