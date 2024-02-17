@@ -1,6 +1,6 @@
 {
     "Mastodon": false,
-    "Misskey": true,
+    "Misskey": false,
 
     "Misskey_ShouldBanUser": false,
 
