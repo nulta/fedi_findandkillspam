@@ -24,7 +24,7 @@ export function printDebug(...params: any[]) {
 
 export async function checkVersion(myVer: number) {
     try {
-        const uri = "https://raw.githubusercontent.com/nulta/fedi_findandkillspam/main/VERSION"
+        const uri = `https://raw.githubusercontent.com/nulta/fedi_findandkillspam/main/VERSION?v=${Math.random()}`
         const text = await fetch(uri).then(r => r.text())
         const newVer = parseFloat(text)
         if (myVer < newVer) {
