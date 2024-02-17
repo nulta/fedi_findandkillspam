@@ -1,4 +1,4 @@
-# fedi_findandkillspam
+# fedi_findandkillspam (Rev 4)
 find and kill those global spam posts
 
 - misskey only (yet)
@@ -34,3 +34,4 @@ find and kill those global spam posts
 
 ### 비고
 **Rev 3부터 제대로 작동합니다.** 그 전까지는 제대로 테스트를 못 했어요...
+**현재 버전은 Rev 4입니다** 변경 사항: 스팸 체크 로직 개선, 업데이트 자동 확인 기능 추가.
