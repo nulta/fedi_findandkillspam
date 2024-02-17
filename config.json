@@ -1,0 +1,9 @@
+{
+    "Mastodon": false,
+    "Misskey": true,
+
+    "Misskey_ShouldBanUser": false,
+
+    "Site": "https://instancename.example.com/",
+    "ApiKey": "???????"
+}
