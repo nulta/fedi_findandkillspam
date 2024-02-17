@@ -48,14 +48,10 @@ export abstract class FediverseSpamInterceptor {
     public examinePost(post: FediversePost): void {
         this.examinedPosts += 1
 
-        console.log(post)
-
         const basics = this.checkBasics(post)
         const badUser = this.checkUserSpamness(post.user)
         const badImage = this.imageChecker.checkPost(post)
         const badPost = this.checkPostSpamness(post)
-
-        console.log(basics, badUser, badImage, badPost)
 
         const shouldKill = basics && badUser && (badImage || badPost)
         if (shouldKill) {
