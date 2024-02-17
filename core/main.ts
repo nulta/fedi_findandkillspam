@@ -1,4 +1,4 @@
-import { printError, printMessage } from "./utils.ts"
+import { printError, printMessage } from "./utils.ts?v=5"
 
 export async function main(cfg: any) {
     printMessage("Initializing!")

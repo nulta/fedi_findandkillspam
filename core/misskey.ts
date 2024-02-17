@@ -1,5 +1,5 @@
-import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts"
-import { printMessage, printError, checkVersion } from "./utils.ts"
+import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=5"
+import { printMessage, printError, checkVersion } from "./utils.ts?v=5"
 
 // import * as cfg from "../config.json" with {type: "json"}
 let cfg: any = null
@@ -111,4 +111,8 @@ export async function start(cfgModule: any) {
         printMessage("processed", interceptor.examinedPosts - lastExaminedPostCount, "notes.")
         lastExaminedPostCount = interceptor.examinedPosts
     }, 10 * 1000)
+
+    setInterval(() => {
+        checkVersion(VER)
+    }, 120 * 1000)
 }
