@@ -1,7 +1,7 @@
 import {printMessage} from "./utils.ts?v=6"
 import {bhes} from "./listes.ts?v=6"
 
-export const VER = 6.0
+export const VER = 7.0
 
 const NEW_ACCOUNT_THRESHOLD_1 = 1000 * 60 * 40
 const NEW_ACCOUNT_THRESHOLD_2 = 1000 * 60 * 60 * 36
