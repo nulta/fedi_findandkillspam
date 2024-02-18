@@ -1,4 +1,4 @@
-# fedi_findandkillspam (Rev 7)
+# fedi_findandkillspam (Rev 8)
 Find and kill those global spam posts.
 
 - ~~misskey only (yet)~~ **Now with Mastodon, too!**

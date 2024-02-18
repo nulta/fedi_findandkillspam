@@ -1,5 +1,5 @@
-import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=7"
-import { printMessage, printError, checkVersion } from "./utils.ts?v=7"
+import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=8"
+import { printMessage, printError, checkVersion } from "./utils.ts?v=8"
 let cfg: any = null
 
 const MISSKEY_STATUS_429 = Symbol()
