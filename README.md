@@ -70,7 +70,7 @@ Find and kill those global spam posts.
         // 미스키에서, 스팸을 올린 사용자를 자동으로 정지할지 정합니다.
         // false일 경우 노트만 삭제하고 사용자를 정지하지는 않습니다.
         // (마스토돈에서는 노트 삭제를 지원하지 않습니다. 그래서 항상 정지합니다.)
-        "Misskey_ShouldBanUser": false,
+        "Misskey_ShouldBanUser": true,
 
         "Site": "https://instancename.example.com/",  // <-- 인스턴스의 주소를 넣으세요
         "ApiKey": "???????"  // <-- API 액세스 토큰을 넣으세요 (아래 설명 참조)
