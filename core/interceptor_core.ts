@@ -1,9 +1,10 @@
-import {printMessage} from "./utils.ts?v=5"
-import {bhes} from "./listes.ts?v=5"
+import {printMessage} from "./utils.ts?v=6"
+import {bhes} from "./listes.ts?v=6"
 
-export const VER = 5.0
+export const VER = 6.0
 
-const NEW_ACCOUNT_THRESHOLD = 1000 * 60 * 40
+const NEW_ACCOUNT_THRESHOLD_1 = 1000 * 60 * 40
+const NEW_ACCOUNT_THRESHOLD_2 = 1000 * 60 * 60 * 36
 const MENTIONS_THRESHOLD_1 = 2
 const MENTIONS_THRESHOLD_2 = 5
 const IMAGE_COUNTER_THRESHOLD = 4
@@ -49,11 +50,16 @@ export abstract class FediverseSpamInterceptor {
         this.examinedPosts += 1
 
         const basics = this.checkBasics(post)
-        const badUser = this.checkUserSpamness(post.user)
+        const badUser1 = this.checkUserSpamness(post.user)
+        const badUser2 = this.checkUserAge(post.user)
         const badImage = this.imageChecker.checkPost(post)
-        const badPost = this.checkPostSpamness(post)
+        const badPost1 = this.checkHashes(post)
+        const badPost2 = this.checkCcs(post)
 
-        const shouldKill = basics && badUser && (badImage || badPost)
+        const criteria1 = basics && badUser1
+        const criteria2 = Number(badUser2) + Number(badPost1) + Number(badImage)*2 + Number(badPost2)*2 >= 2
+        const shouldKill = criteria1 && criteria2
+
         if (shouldKill) {
             printMessage(`Caught bad post ${post.postId} from user ${post.user.username}@${post.user.host ?? "THIS_SERVER"}.`)
             printMessage(`Content: ${post.text.slice(0, 300).replaceAll("\n","\\n")}`)
@@ -63,22 +69,27 @@ export abstract class FediverseSpamInterceptor {
     }
 
     checkUserSpamness(user: FediverseUser): boolean {
-        const aaa = user.firstSeenAt.getTime() > Date.now() - NEW_ACCOUNT_THRESHOLD
-        const bbb = !user.avatarExists
-        const ccc = !user.nickname || user.username == user.nickname
-        return aaa && (bbb && ccc)
+        const aaa = !user.avatarExists
+        const bbb = !user.nickname || user.username == user.nickname
+        return aaa && bbb
     }
 
-    checkPostSpamness(post: FediversePost): boolean {
-        let score = 0
-        if (post.mentions >= MENTIONS_THRESHOLD_2) { score++ }
-        if (post.text.includes("#")) { score++ }
-        return score >= 1
+    checkHashes(post: FediversePost): boolean {
+        return post.text.includes("#")
     }
 
     checkBasics(post: FediversePost): boolean {
         if (post.mentions < MENTIONS_THRESHOLD_1) { return false }
+        if (post.user.firstSeenAt.getTime() <= Date.now() - NEW_ACCOUNT_THRESHOLD_2) { return false }
         return true
+    }
+
+    checkUserAge(user: FediverseUser): boolean {
+        return user.firstSeenAt.getTime() > Date.now() - NEW_ACCOUNT_THRESHOLD_1
+    }
+
+    checkCcs(post: FediversePost): boolean {
+        return post.mentions >= MENTIONS_THRESHOLD_2
     }
 }
 

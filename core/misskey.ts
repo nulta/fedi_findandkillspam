@@ -1,7 +1,5 @@
-import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=5"
-import { printMessage, printError, checkVersion } from "./utils.ts?v=5"
-
-// import * as cfg from "../config.json" with {type: "json"}
+import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=6"
+import { printMessage, printError, checkVersion } from "./utils.ts?v=6"
 let cfg: any = null
 
 async function mkApi(endpoint: string, body: any) {
