@@ -1,5 +1,5 @@
-import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=6"
-import { printMessage, printError, checkVersion } from "./utils.ts?v=6"
+import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=7"
+import { printMessage, printError, checkVersion } from "./utils.ts?v=7"
 let cfg: any = null
 
 async function mastoApi(method: string, endpoint: string, body: any) {

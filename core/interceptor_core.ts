@@ -1,5 +1,5 @@
-import {printMessage} from "./utils.ts?v=6"
-import {bhes} from "./listes.ts?v=6"
+import {printMessage} from "./utils.ts?v=7"
+import {bhes} from "./listes.ts?v=7"
 
 export const VER = 7.0
 
