@@ -57,8 +57,9 @@ Find and kill those global spam posts.
 2. 모더레이터 권한이 있는 계정에서, API 액세스 토큰을 발급합니다
     - 아래의 설명을 보세요
 3. `start.ts`, `config.json`, (`start.bat` 또는 `start.sh`)을 내려받습니다
-    - 자동 업데이트를 사용한다면, 나머지 파일들은 필요없습니다.
-    - Windows라면 `start.bat`, 리눅스 계통이라면 `start.sh`를 내려받습니다.
+    - 자동 업데이트를 사용한다면, 나머지 파일들은 필요없습니다. (있어도 문제는 되지 않지만요)
+    - Windows라면 `start.bat`, 리눅스 계통이라면 `start.sh`를 사용합니다.
+    - ![image](https://github.com/nulta/fedi_findandkillspam/assets/35414766/aabaaaf5-9af2-4c8f-9cc1-e1f948b9c969)
 4. 설정을 합니다
     - **config.json**을 열고 값을 수정합니다
     ```jsonc
