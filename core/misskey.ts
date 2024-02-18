@@ -30,8 +30,10 @@ async function mkApi(endpoint: string, body: any) {
 class MisskeySpamInterceptor extends FediverseSpamInterceptor {
     suspendUser(user: FediverseUser): void {
         if (!cfg.default.Misskey_ShouldBanUser) {return}
-        printMessage("Suspended user", `${user.username}@${user.host ?? "THIS_SERVER"}`)
-        mkApi("admin/suspend-user", {userId: user.userId})
+        setTimeout(() => {
+            printMessage("Suspended user", `${user.username}@${user.host ?? "THIS_SERVER"}`)
+            mkApi("admin/suspend-user", {userId: user.userId})
+        }, Math.floor(Math.random() * 6000));
     }
 
     deletePost(post: FediversePost): void {
