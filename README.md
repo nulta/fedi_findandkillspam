@@ -1,4 +1,4 @@
-# fedi_findandkillspam (Rev 5)
+# fedi_findandkillspam (Rev 7)
 Find and kill those global spam posts.
 
 - ~~misskey only (yet)~~ **Now with Mastodon, too!**
@@ -93,6 +93,8 @@ Find and kill those global spam posts.
   permission: ['read:account', 'write:notes', 'write:admin:suspend-user'],
 }).token
 ```
+3. **제어판의 역할 설정에서, 모더레이터의 `요청 빈도 제한`을 `0%`로 설정해 주세요.**
+    - 기본값(100%)에서는, 노트를 1시간에 300개까지만 삭제할 수 있습니다. (유저 정지에는 제한이 없습니다.)
 
 ### (Mastodon) API 액세스 토큰 얻기
 1. 설정 -> 개발 -> 새로운 애플리케이션
@@ -114,4 +116,6 @@ Find and kill those global spam posts.
 ### 비고
 **Rev 3부터 제대로 작동합니다.** 그 전까지는 제대로 테스트를 못 했어요...
 
-**Rev 5부터 자동 업데이트를 지원합니다.** 서버에서 최신 스크립트를 자동으로 받아와서 실행합니다. (다만, 보안상 신경쓰이는 부분이 있다면 로컬로 실행하는 것이 나을 수도 있습니다.)
+**Rev 5부터 자동 업데이트를 지원합니다.** 켜두기만 하면 서버에서 최신 스크립트를 자동으로 받아와서 실행합니다. (다만, 보안상 신경쓰이는 부분이 있다면 로컬로 실행하는 것이 나을 수도 있습니다.)
+
+**Rev 7부터 미스키에서도 웹소켓을 사용합니다.** 처리 누락되는 노트가 줄어들고 반응시간이 빨라질 것으로 예상합니다.
