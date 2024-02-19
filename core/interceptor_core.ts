@@ -1,14 +1,14 @@
-import {printMessage} from "./utils.ts?v=8"
-import {bhes} from "./listes.ts?v=8"
+import {printMessage} from "./utils.ts?v9"
+import {bhes} from "./listes.ts?v=9"
 
-export const VER = 8.0
+export const VER=9.0
 
-const NEW_ACCOUNT_THRESHOLD_1 = 1000 * 60 * 40
-const NEW_ACCOUNT_THRESHOLD_2 = 1000 * 60 * 60 * 36
+const NEW_ACCOUNT_THRESHOLD_1 = 1000 * 60 * 60
+const NEW_ACCOUNT_THRESHOLD_2 = 1000 * 60 * 60 * 24 * 5
 const MENTIONS_THRESHOLD_1 = 2
 const MENTIONS_THRESHOLD_2 = 5
 const IMAGE_COUNTER_THRESHOLD = 3
-const IMAGE_COUNTER_DECAY_AMOUNT = 0.1
+const IMAGE_COUNTER_DECAY_AMOUNT = 0.2
 const IMAGE_COUNTER_VALUE_MAXIMUM = 30
 
 
@@ -49,6 +49,8 @@ export abstract class FediverseSpamInterceptor {
     public examinePost(post: FediversePost): void {
         this.examinedPosts += 1
 
+        if (this.isUserTrusted(post.user)) { return }
+
         const basics = this.checkBasics(post)
         const badUser1 = this.checkUserSpamness(post.user)
         const badUser2 = this.checkUserAge(post.user)
@@ -68,6 +70,10 @@ export abstract class FediverseSpamInterceptor {
         }
     }
 
+    isUserTrusted(user: FediverseUser): boolean {
+        return user.firstSeenAt.getTime() <= Date.now() - NEW_ACCOUNT_THRESHOLD_2
+    }
+
     checkUserSpamness(user: FediverseUser): boolean {
         const aaa = !user.avatarExists
         const bbb = !user.nickname || user.username == user.nickname
@@ -79,9 +85,7 @@ export abstract class FediverseSpamInterceptor {
     }
 
     checkBasics(post: FediversePost): boolean {
-        if (post.mentions < MENTIONS_THRESHOLD_1) { return false }
-        if (post.user.firstSeenAt.getTime() <= Date.now() - NEW_ACCOUNT_THRESHOLD_2) { return false }
-        return true
+        return post.mentions >= MENTIONS_THRESHOLD_1
     }
 
     checkUserAge(user: FediverseUser): boolean {
@@ -126,13 +130,17 @@ class ImageOccurrenceChecker {
         if (blurhash == null) {return false}
 
         // Split the blurhash
-        const splits: string[] = blurhash.match(/.{1,6}/g) ?? []
+        let splits: string[]
+        if (blurhash.length > 40) {
+            splits = blurhash.match(/.{1,4}/g) ?? []
+        } else {
+            splits = blurhash.match(/.{1,3}/g) ?? []
+        }
+        splits = splits.map((v, i) => `${i} ${v}`)
+
+        // Lookup and insert
         let detections = 0
-
-        // To ignore small changes
-        splits.forEach((v, i) => {
-            const key = `${i} ${v}`
-
+        splits.forEach((key) => {
             if (this.sameNoteSplits.has(key)) { return }
             this.sameNoteSplits.add(key)
     
@@ -148,8 +156,8 @@ class ImageOccurrenceChecker {
             }
         })
 
-        // 5 of 9, or 5 of 6
-        return detections >= 5
+        // 8 of 12 or 14
+        return detections >= 8
     }
 }
 

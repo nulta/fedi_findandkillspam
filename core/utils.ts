@@ -42,3 +42,13 @@ export async function checkVersion(myVer: number) {
         printError("Failed to fetch version information.")
     }
 }
+
+export function countExternalMentions(text: string): number {
+    text = " " + text
+    const mentions = text.match(
+        /[ \n]@[a-zA-Z0-9_]+([a-zA-Z0-9_.-]+[a-zA-Z0-9_]+)?@[-a-zA-Z0-9._]{1,256}\.[-a-zA-Z0-9]{1,25}/g
+    ) ?? []
+
+    const uniqueMentions = new Set(mentions.map(v => v.replace(/^[ \n]/, "")))
+    return uniqueMentions.size
+}

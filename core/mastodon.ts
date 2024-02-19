@@ -1,5 +1,5 @@
-import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=8"
-import { printMessage, printError, checkVersion } from "./utils.ts?v=8"
+import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=9"
+import { printMessage, printError, checkVersion, countExternalMentions } from "./utils.ts?v=9"
 let cfg: any = null
 
 async function mastoApi(method: string, endpoint: string, body: any) {
@@ -14,6 +14,27 @@ async function mastoApi(method: string, endpoint: string, body: any) {
         headers,
         body: jsonBody,
         method: method,
+    })
+
+    if (!res.ok) {
+        printError(`API Request to ${endpoint} Failed:`, res.status)
+        printError(`body:`, await res.text().catch(_ => "(failed to parse)"))
+        return undefined
+    }
+
+    const resJson = await res.json().catch(_ => undefined)
+    return resJson
+}
+
+async function mastoApiGet(endpoint: string) {
+    const url = cfg.default.Site.replace(/\/$/, "") + "/api/v1/" + endpoint
+    const headers = {
+        "Authorization": `Bearer ${cfg.default.ApiKey}`
+    }
+
+    const res = await fetch(url, {
+        headers,
+        method: "GET",
     })
 
     if (!res.ok) {
@@ -41,8 +62,53 @@ class MastodonSpamInterceptor extends FediverseSpamInterceptor {
     }
 }
 
+function getMentions(text: string, mentions: string[]): number {
+    text = text.replaceAll(/(<br ?\/?>|<\/p>)/g, "\n") ?? ""
+    text = text.replaceAll(/<[^>]*>/g, "") ?? ""
+
+    return mentions.length + countExternalMentions(text)
+}
+
 function parseMastodonId(id: string): Date {
     return new Date(Number(BigInt(id) >> 16n))
+}
+
+function processToot(toot: any) {
+    const fediPost: FediversePost = {
+        createdAt: parseMastodonId(toot.id),
+        files: toot.media_attachments.map((file: any) => {
+            return {
+                uri: file.url,
+                blurHash: file.blurhash,
+            }
+        }),
+        mentions: getMentions(toot.content ?? "", toot.mentions ?? []),
+        postId: toot.id,
+        text: toot.content ?? "",
+        user: {
+            userId: toot.account.id,
+            firstSeenAt: parseMastodonId(toot.account.id),
+            avatarExists: toot.account.avatar && !toot.account.avatar.endsWith("missing.png"),
+            avatarUri: toot.account.avatar ?? null,
+            host: toot.account.acct.split("@")[1] ?? null,
+            nickname: toot.account.display_name || null,
+            username: toot.account.username,
+        },
+        visibility: toot.visibility,
+    }
+
+    interceptor.examinePost(fediPost)
+}
+
+async function fetchToots(limit: number) {
+    // Maximum limit is 40
+    const toots: any[] | undefined = await mastoApiGet(`timelines/public?limit=${limit}`)
+
+    if (toots === undefined) {
+        return printError("Failed to fetch toots? got undefined response.")
+    }
+
+    toots.forEach(processToot)
 }
 
 const interceptor = new MastodonSpamInterceptor()
@@ -57,6 +123,8 @@ async function watch() {
         socket.addEventListener("error", reject)
     })
 
+    printMessage("Connected to WebSocket!")
+
     socket.addEventListener("message", (ev) => {
         let message = null
         try {
@@ -64,10 +132,10 @@ async function watch() {
         } catch(_) {
             return printError("Failed to parse WebSocket data as JSON:", ev.data)
         }
-        
+
         const {event, payload} = message
         if (event != "update") { return }
-        
+
         let toot = null
         try {
             toot = JSON.parse(payload)
@@ -75,30 +143,7 @@ async function watch() {
             return printError("Failed to parse payload as JSON:", payload)
         }
 
-        const fediPost: FediversePost = {
-            createdAt: parseMastodonId(toot.id),
-            files: toot.media_attachments.map((file: any) => {
-                return {
-                    uri: file.url,
-                    blurHash: file.blurhash,
-                }
-            }),
-            mentions: toot.mentions?.length ?? 0,
-            postId: toot.id,
-            text: toot.content ?? "",
-            user: {
-                userId: toot.account.id,
-                firstSeenAt: parseMastodonId(toot.account.id),
-                avatarExists: toot.account.avatar && !toot.account.avatar.endsWith("missing.png"),
-                avatarUri: toot.account.avatar ?? null,
-                host: toot.account.acct.split("@")[1] ?? null,
-                nickname: toot.account.display_name || null,
-                username: toot.account.username,
-            },
-            visibility: toot.visibility,
-        }
-
-        interceptor.examinePost(fediPost)
+        processToot(toot)
     })
 
     socket.addEventListener("close", (ev) => {
@@ -132,8 +177,15 @@ export async function start(cfgModule: any) {
 
     // Status reporter
     setInterval(() => {
-        printMessage("processed", interceptor.examinedPosts - lastExaminedPostCount, "toots.")
+        printMessage("scanned", interceptor.examinedPosts - lastExaminedPostCount, "toots.")
         lastExaminedPostCount = interceptor.examinedPosts
     }, 10 * 1000)
 
+    // Initial fetching
+    fetchToots(40)
+
+    // Refetch every 5 minutes
+    setInterval(() => {
+        fetchToots(40)
+    }, 300 * 1000)
 }

@@ -1,5 +1,5 @@
-import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=8"
-import { printMessage, printError, checkVersion } from "./utils.ts?v=8"
+import { FediversePost, FediverseSpamInterceptor, FediverseUser, VER } from "./interceptor_core.ts?v=9"
+import { printMessage, printError, checkVersion, countExternalMentions } from "./utils.ts?v=9"
 let cfg: any = null
 
 const MISSKEY_STATUS_429 = Symbol()
@@ -106,7 +106,7 @@ function processNote(note: any) {
                 blurHash: file.blurhash,
             }
         }),
-        mentions: note.mentions?.length ?? 0,
+        mentions: countExternalMentions(note.text ?? ""),
         postId: note.id,
         text: note.text ?? "",
         user: {
@@ -211,7 +211,7 @@ export async function start(cfgModule: any) {
 
     // Status reporter
     setInterval(() => {
-        printMessage("processed", interceptor.examinedPosts - lastExaminedPostCount, "notes.")
+        printMessage("scanned", interceptor.examinedPosts - lastExaminedPostCount, "notes.")
         lastExaminedPostCount = interceptor.examinedPosts
     }, 10 * 1000)
 

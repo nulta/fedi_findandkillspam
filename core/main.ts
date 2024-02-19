@@ -1,4 +1,4 @@
-import { printError, printMessage } from "./utils.ts?v=8"
+import { printError, printMessage } from "./utils.ts?v=9"
 
 export async function main(cfg: any) {
     printMessage("Initializing!")
@@ -26,9 +26,9 @@ export async function main(cfg: any) {
 
     let module = null
     if (isMisskey) {
-        module = await import("./misskey.ts?v=8")
+        module = await import("./misskey.ts?v=9")
     } else {
-        module = await import("./mastodon.ts?v=8")
+        module = await import("./mastodon.ts?v=9")
     }
     module.start(cfg)
 }
