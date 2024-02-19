@@ -7,7 +7,7 @@ WORKDIR /opt/fedi-killspam
 
 RUN apt-get update && apt-get install -y curl unzip
 
-ADD . /opt/fedi-killspam/
+COPY . /opt/fedi-killspam/
 RUN ln -s /config/config.json /opt/fedi-killspam/config.json
 
 
