@@ -1,4 +1,4 @@
-# fedi_findandkillspam (Rev 8)
+# fedi_findandkillspam (Rev 9)
 Find and kill those global spam posts.
 
 - ~~misskey only (yet)~~ **Now with Mastodon, too!**
@@ -119,3 +119,5 @@ Find and kill those global spam posts.
 **Rev 5부터 자동 업데이트를 지원합니다.** 켜두기만 하면 서버에서 최신 스크립트를 자동으로 받아와서 실행합니다. (다만, 보안상 신경쓰이는 부분이 있다면 로컬로 실행하는 것이 나을 수도 있습니다.)
 
 **Rev 7부터 미스키에서도 웹소켓을 사용합니다.** 처리 누락되는 노트가 줄어들고 반응시간이 빨라질 것으로 예상합니다.
+
+**Rev 9에서 탐지를 빠져나가는 몇 가지 경우를 수정했습니다.**
