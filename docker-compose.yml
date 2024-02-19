@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  killspam:
+    build: .
+    volumes:
+      - ./config.json:/config/config.json:ro
+    restart: unless-stopped
